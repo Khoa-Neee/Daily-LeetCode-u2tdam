@@ -1,0 +1,21 @@
+class Solution {
+public:
+    int minSteps(int n) {
+        int cnt = 0;
+        int sl = 1;
+        int tmp = 1;
+        while (sl < n){
+            while (n % tmp == 0 && sl <= n ){
+                sl += tmp;
+                cnt += 1;
+                if (n % sl == 0 || n == sl){
+                    tmp = sl;
+                    break;
+                }
+            }  
+            cnt += 1;
+            if (sl == n) break;
+        }
+        return cnt++;
+    }
+};
