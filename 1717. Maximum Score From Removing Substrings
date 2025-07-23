@@ -1,0 +1,31 @@
+# Topic: Greedy + Stack
+# Ý tưởng chính: Thực hiện 2 giai đoạn.
+# Giai đoạn 1: Sử dụng Stack và xóa toàn bộ sub-string có score cao hơn.
+# Giai đoạn 2: Sử dụng Stack và xóa sub-string còn lại.
+
+# Exp1: Không thể dùng 1 vòng lặp để xóa cả 2 sub-str được. Bởi vì sẽ bỏ qua các sub-str có score cao hơn ở phần sau (chưa được duyệt tới)
+# Ví dụ:(ab: 5, ba: 4)  bbaabb
+# Thực hiện tới vòng lặp thứ 3 sẽ xóa b(ba)abb -> rồi sẽ xóa (ba)bb -> tổng score 8
+# Trong khi có thể xóa bba(ab)b rồi xóa bb(ab) -> Tổng score 10
+
+class Solution:
+    def maximumGain(self, s: str, x: int, y: int) -> int:
+        def remove_pairs (pair, score):
+            nonlocal s
+            res = 0
+            stack = []
+            for c in s:
+                if c == pair [1] and stack and stack[-1] == pair[0]:
+                    stack.pop()
+                    res += score
+                else:
+                    stack.append(c)
+            s = "".join(stack)
+            return res
+
+        res = 0
+        pair = "ab" if x > y else "ba"
+        res += remove_pairs (pair, max(x, y))
+        res += remove_pairs (pair [::-1], min(x, y))
+        return res
+        
