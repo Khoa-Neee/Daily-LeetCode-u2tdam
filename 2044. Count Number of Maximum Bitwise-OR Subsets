@@ -1,0 +1,18 @@
+class Solution:
+    def countMaxOrSubsets(self, nums: List[int]) -> int:
+        result = {'max_or': 0, 'count': 0}
+
+        def backtrack(index: int, current_or: int):
+            if index == len(nums): #Đã duyệt qua tất cả phần tử trong mảng (chọn hoặc không chọn mỗi phần tử)
+                if current_or == result['max_or']:
+                    result['count'] += 1
+                elif current_or > result['max_or']:
+                    result['max_or'] = current_or
+                    result['count'] = 1
+                return
+            # Gọi đệ quy khi chọn hoặc không chọn phần tử hiện tại
+            backtrack(index + 1, current_or | nums[index])  # chọn
+            backtrack(index + 1, current_or)                # không chọn
+
+        backtrack(0, 0)
+        return result['count']
