@@ -1,0 +1,57 @@
+# First Approach
+# Time Limit Exceeded at TestCase 54
+# Độ phức tạp O(n^2)
+class Solution:
+    def smallestSubarrays(self, nums: List[int]) -> List[int]:
+        ans = []
+        for i in range(len(nums)):
+            res = {'max_len': 1, 'val': nums[i]}
+            length = 1
+            temp = nums[i]
+            for j in range(i + 1, len(nums)):
+                temp = temp | nums[j]
+                length += 1
+                if temp > res['val']:
+                    res['max_len'] = length
+                    res['val'] = temp
+            ans.append(res['max_len'])
+        return ans
+
+# ✅ Giải pháp tối ưu — Duyệt ngược + Bit Tracking
+# 🔑 Ý tưởng chính:
+# Thay vì mỗi lần đều tính lại OR từ đầu → ta theo dõi các bit 1 đã xuất hiện.
+# Vì mỗi số nguyên có tối đa 32 bit, ta có thể theo dõi vị trí gần nhất mà bit b = 1 đã xuất hiện.
+
+✨ Ví dụ minh họa:
+Giả sử nums = [1, 0, 2, 1, 3]
+ans = [1, 1, 1, 1, 1]
+
+# Xem từ dưới lên sẽ dễ hiểu hơn!
+
+1 = 0001 # thiếu bit 2 nên cần lấy bit 2 ở nums[2], duyệt qua nums[1] -> ans[0] = 3
+0 = 0000 # thiếu bit 2 và bit 3 nên cần lấy bit 2 ở nums[2] và bit 3 ở nums[3] -> ans[1] = 3  
+2 = 0010 # thiếu bit thứ 3 nên cần lấy bit 3 ở nums[3] -> ans[2] = 2  
+1 = 0001 # thiếu bit thứ 2 nên cần lấy bit 2 ở nums[4] -> ans[3] = 2  
+3 = 0011 # auto ans[4] = 1 vì không thể lấy thêm bit nào ở sau
+
+=> ans = [3, 3, 2, 2, 1]
+
+Độ phức tạp: O(n*32) = O(n)
+class Solution:
+    def smallestSubarrays(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        ans = [1] * n   # Kết quả ban đầu, mỗi phần tử có độ dài ít nhất là 1
+        last_pos = [0] * 32  # 32 bit cho int
+        
+        for i in range(n - 1, -1, -1):
+            for b in range(32):
+                if (nums[i] >> b) & 1:
+                    last_pos[b] = i  # cập nhật vị trí cuối cùng bit b bật
+            
+            farthest = i 
+            for b in range(32):
+                if last_pos[b] > farthest:
+                    farthest = last_pos[b]
+            ans[i] = farthest - i + 1
+        return ans
+                    
